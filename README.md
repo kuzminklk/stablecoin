@@ -1,4 +1,5 @@
 
+
 ### Description
 Stablecoin
 1. Relative Stability: Anchored (Pegged) to USD
@@ -15,15 +16,12 @@ Finished, tested locally, but don't deployed to testnet
 ### To-dos
 - Deploy to testnet
 - Write appropriate commands in ```./commands.bash```
+- Change dependences to newest
 
 
 ### Set up
 Install foundry dependences:  
-```forge install foundry-rs/forge-std@v1.16.1 --no-git```   
-```forge install openzeppelin/openzeppelin-contracts@v5.6.1 --no-git```  
-```forge install cyfrin/foundry-devops@0.4.0 --no-git```  
-```forge install smartcontractkit/chainlink-local@v0.2.9-beta.0 --no-git --no-git```
-```forge install smartcontractkit/chainlink-brownie-contracts@1.3.0 --no-git```
+```forge install```
 
 ### Deployments and interactions
 Don't deploy
