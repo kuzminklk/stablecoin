@@ -16,16 +16,17 @@ depth = 128
 fail_on_revert = true
 
 [rpc_endpoints]
-sepolia = "${SEPOLIA_RPC_URL}"
+ethereum = "${ETHEREUM_RPC_URL}"
+ethereum-sepolia = "${ETHEREUM_SEPOLIA_RPC_URL}"
 base-sepolia = "${BASE_SEPOLIA_RPC_URL}"
-mainnet = "${ETHEREUM_RPC_URL}"
-zk-sepolia = "${ZK_SEPOLIA_RPC_URL}"
+zksync-sepolia = "${ZKSYNC_SEPOLIA_RPC_URL}"
+avalanche-fuji = "${AVALANCHE_FUJI_RPC_URL}"
 anvil = "http://127.0.0.1:8545"
-anvil-zk = "http://0.0.0.0:8011"
+anvil-zksync = "http://0.0.0.0:8011"
 
 [etherscan]
-mainnet = { key = "${ETHERSCAN_API_KEY}" }
-sepolia = { key = "${ETHERSCAN_API_KEY}" }
+ethereum = { key = "${ETHERSCAN_API_KEY}" }
+ethereum-sepolia = { key = "${ETHERSCAN_API_KEY}" }
 
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

@@ -9,6 +9,9 @@ Stablecoin
    - Mint with collateral
 3. Collateral: Exogenous (Cryptocurrencies: wETC, wBTC)
 
+### Purpose
+Part of Advanced Foundry course from Cyfrin Updraft and as submodule in [appropriate repository](https://github.com/kuzminklk/cyfrin-updraft)  
+
 
 ### Status
 Finished, tested locally, but don't deployed to testnet
