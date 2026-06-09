@@ -14,11 +14,11 @@ Part of Advanced Foundry course from Cyfrin Updraft and as submodule in [appropr
 
 
 ### Status
-Finished, tested locally, but don't deployed to testnet
+Finished, tested locally, but didn't deployed to testnet
 
 ### To-dos
 - Deploy to testnet
-- Write appropriate commands in ```./commands.bash```
+- Write appropriate commands in ```./commands.sh```
 - Change dependences to newest
 
 
@@ -27,4 +27,4 @@ Install foundry dependences:
 ```forge install```
 
 ### Deployments and interactions
-Don't deploy
+Didn't deployed for now
