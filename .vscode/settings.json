@@ -1,0 +1,12 @@
+{
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"prettier.requireConfig": true,
+	"solidity.formatter": "forge",
+	"[solidity]": {
+		"editor.defaultFormatter": "JuanBlanco.solidity"
+	},
+	"[toml]": {
+		"editor.defaultFormatter": "tamasfe.even-better-toml"
+	}
+}

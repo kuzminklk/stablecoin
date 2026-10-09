@@ -1,25 +1,19 @@
-
-
-
 /* Handler is narrow down the way we call fucntions */
-
-
 
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.19;
 
-import { Engine } from "../../src/Engine.sol";
-import { Stablecoin } from "../../src/Stablecoin.sol";
-import { DeploySystem } from "../../script/DeploySystem.s.sol";
-import { HelperConfig } from "../../script/HelperConfig.s.sol";
+import {Engine} from "../../src/Engine.sol";
+import {Stablecoin} from "../../src/Stablecoin.sol";
+import {DeploySystem} from "../../script/DeploySystem.s.sol";
+import {HelperConfig} from "../../script/HelperConfig.s.sol";
 
-import { console, Test } from "forge-std/Test.sol";
-import { StdInvariant } from "forge-std/StdInvariant.sol";
-import { ERC20Mock } from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { MockV3Aggregator } from "../mocks/MockV3Aggregator.sol";
-
+import {console, Test} from "forge-std/Test.sol";
+import {StdInvariant} from "forge-std/StdInvariant.sol";
+import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {MockV3Aggregator} from "../mocks/MockV3Aggregator.sol";
 
 contract Handler is Test {
 	Engine public engineContract;
@@ -45,9 +39,9 @@ contract Handler is Test {
 		address collateralToken = _getCollateralTokenFromSeed(collateralTokenSeed);
 		uint256 boundedCollateralAmount = bound(collateralAmountSeed, 1, MAX_DEPOSIT_AMOUNT);
 		vm.startPrank(msg.sender);
-			ERC20Mock(collateralToken).mint(msg.sender, boundedCollateralAmount);
-			ERC20Mock(collateralToken).approve(address(engineContract), boundedCollateralAmount);
-			engineContract.depositCollateral(collateralToken, boundedCollateralAmount);
+		ERC20Mock(collateralToken).mint(msg.sender, boundedCollateralAmount);
+		ERC20Mock(collateralToken).approve(address(engineContract), boundedCollateralAmount);
+		engineContract.depositCollateral(collateralToken, boundedCollateralAmount);
 		vm.stopPrank();
 	}
 
@@ -57,7 +51,7 @@ contract Handler is Test {
 		vm.assume(fullCollateralAmount != 0);
 		uint256 boundedCollateralAmount = bound(collateralAmountSeed, 1, fullCollateralAmount);
 		vm.startPrank(msg.sender);
-			engineContract.redeemCollateral(collateralToken, boundedCollateralAmount);
+		engineContract.redeemCollateral(collateralToken, boundedCollateralAmount);
 		vm.stopPrank();
 	}
 
@@ -69,7 +63,7 @@ contract Handler is Test {
 		uint256 mintAmount = boundedCollateralAmount / 2;
 		vm.assume(mintAmount != 0);
 		vm.startPrank(msg.sender);
-			engineContract.mintStablecoins(mintAmount);
+		engineContract.mintStablecoins(mintAmount);
 		vm.stopPrank();
 	}
 

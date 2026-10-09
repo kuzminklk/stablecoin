@@ -1,7 +1,4 @@
-
-
-
-/* 
+/*
 Layout of Smart-Contract: (in theory and in practice here)
 1. Version
 2. Imports
@@ -14,7 +11,7 @@ Layout of Smart-Contract: (in theory and in practice here)
 9. Funcitons
 */
 
-/* 
+/*
 Layout of functions: (in theory)
 1. Constructor
 2. Recive Function
@@ -24,7 +21,7 @@ Layout of functions: (in theory)
 6. View, Pure
 */
 
-/* 
+/*
 Layout of functions sections: (in practice here)
 1. Constructor
 2. Deposit
@@ -35,34 +32,30 @@ Layout of functions sections: (in practice here)
 7. Liquidation
 */
 
-
-
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.26;
 
-import { ReentrancyGuardTransient } from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
-import { Stablecoin } from "./Stablecoin.sol";
-import { Oracle } from "./libraries/Oracle.sol";
-
+import {Stablecoin} from "./Stablecoin.sol";
+import {Oracle} from "./libraries/Oracle.sol";
 
 /**
- * @title Stablecoin Engine
- * @author kuzminklk (Daniil Kuzmin)
- * @notice Meant to be the core of the stablecoin system, governing minting, burning, collateral managment and liquidation mechanics
+ *	@title Stablecoin Engine
+ *	@author kuzminklk (Daniil Kuzmin)
+ *	@notice Meant to be the core of the stablecoin system, governing minting, burning, collateral managment and liquidation mechanics
  *
- * — Stablecoin System Description —
- * Relative Stability: Anchored (Pegged) to USD
- * Stability Mechanism (Minting): Algorithmic
- * Collateral: Exogenous (wETH, wBTC)
- * System always should be overcollateralized
- * (Similar to DAI, if DAI had no gevernance, no fees, and only backed by wETH, wBTC colateral)
+ *	— Stablecoin System Description —
+ *	Relative Stability: Anchored (Pegged) to USD
+ *	Stability Mechanism (Minting): Algorithmic
+ *	Collateral: Exogenous (wETH, wBTC)
+ *	System always should be overcollateralized
+ *	(Similar to DAI, if DAI had no gevernance, no fees, and only backed by wETH, wBTC colateral)
  */
 contract Engine is ReentrancyGuardTransient {
-
 	// — Errors —
 
 	error Engine__AmountMustBeGreaterThanZero();
@@ -77,7 +70,7 @@ contract Engine is ReentrancyGuardTransient {
 	error Engine__BreaksOvercollateralizationHealthFactorThreshold(uint256 healthFactor);
 
 	// — Type —
-	
+
 	using Oracle for AggregatorV3Interface;
 
 	// — State Variables —
@@ -96,7 +89,7 @@ contract Engine is ReentrancyGuardTransient {
 	4. From 1 to 0 — Ideally, should be not possible; means that collateral lost value and doesn't be liquidated in time
 	*/
 
-	Stablecoin immutable private i_stablecoin;
+	Stablecoin private immutable i_stablecoin;
 
 	mapping(address token => address priceFeed) private s_tokenToPriceFeed; /// Allowed for collateral tokens
 	mapping(address user => mapping(address token => uint256 amount)) private s_userToDeposit;
@@ -125,16 +118,15 @@ contract Engine is ReentrancyGuardTransient {
 		_;
 	}
 
-
 	// ——— Functions ———
 
 	// — Constructor —
 
 	/**
-	 * @param tokens Addresses of acceptable ERC20 tokens for collateral
-	 * @param priceFeeds Price Feeds for these tokens
-	 * @param stablecoin ERC20 Stablecoin for this Engine to mint and burn
-	 * @dev Tokens and Price Feeds arrays must be in the same order, so we can map token to it's price feed by index
+	 *	@param tokens Addresses of acceptable ERC20 tokens for collateral
+	 *	@param priceFeeds Price Feeds for these tokens
+	 *	@param stablecoin ERC20 Stablecoin for this Engine to mint and burn
+	 *	@dev Tokens and Price Feeds arrays must be in the same order, so we can map token to it's price feed by index
 	 */
 	constructor(address[] memory tokens, address[] memory priceFeeds, Stablecoin stablecoin) {
 		if (tokens.length != priceFeeds.length) {
@@ -152,12 +144,17 @@ contract Engine is ReentrancyGuardTransient {
 	// — Deposit —
 
 	/**
-	 * @notice Deposit collateral to the system
-	 * @param token The address of the token to deposit as collateral
-	 * @param amount The amount of tokens as collateral
-	 * @dev Follows CEI pattern, have reentrancy guard
+	 *	@notice Deposit collateral to the system
+	 *	@param token The address of the token to deposit as collateral
+	 *	@param amount The amount of tokens as collateral
+	 *	@dev Follows CEI pattern, have reentrancy guard
 	 */
-	function depositCollateral(address token, uint256 amount) public amountMoreThanZero(amount) allowedToken(token) nonReentrant() {
+	function depositCollateral(address token, uint256 amount)
+		public
+		amountMoreThanZero(amount)
+		allowedToken(token)
+		nonReentrant
+	{
 		// Effects
 		s_userToDeposit[msg.sender][token] += amount;
 		emit CollateralDeposited(msg.sender, token, amount);
@@ -168,18 +165,22 @@ contract Engine is ReentrancyGuardTransient {
 		}
 	}
 
-	function depositCollateralAndMintStablecoins(address collateralToken, uint256 collateralAmount, uint256 stablecoinsAmount ) public {
+	function depositCollateralAndMintStablecoins(
+		address collateralToken,
+		uint256 collateralAmount,
+		uint256 stablecoinsAmount
+	) public {
 		depositCollateral(collateralToken, collateralAmount);
 		mintStablecoins(stablecoinsAmount);
 	}
 
 	// — Mint Stablecoins —
-	
+
 	/**
-	 * @param amount The amount of tokens to mint
-	 * @dev User must have two times more collateral for minting value (200% overcollateralization)
+	 *	@param amount The amount of tokens to mint
+	 *	@dev User must have two times more collateral for minting value (200% overcollateralization)
 	 */
-	function mintStablecoins(uint256 amount) public amountMoreThanZero(amount) nonReentrant() {
+	function mintStablecoins(uint256 amount) public amountMoreThanZero(amount) nonReentrant {
 		s_userToMintedStablecoins[msg.sender] += amount;
 		_checkOvercollateralizationHealthFactor(msg.sender);
 		bool success = i_stablecoin.mint(msg.sender, amount);
@@ -191,18 +192,18 @@ contract Engine is ReentrancyGuardTransient {
 	// — Collateral (Calculate, Redeem) —
 
 	/**
-	 * @notice Get total value of token amount in USD
-	 * @dev Uses Chainlink Price Feeds
-	 * @return total The total value of collateral in USD with 1e18 precision
+	 *	@notice Get total value of token amount in USD
+	 *	@dev Uses Chainlink Price Feeds
+	 *	@return total The total value of collateral in USD with 1e18 precision
 	 */
 	function getValueInUSD(address token, uint256 amount) public view returns (uint256) {
 		AggregatorV3Interface priceFeed = AggregatorV3Interface(s_tokenToPriceFeed[token]);
 		if (priceFeed.checkPriceStaleness()) revert Engine__OraclePriceIsStale();
-		( , int256 price, , , ) = priceFeed.latestRoundData(); // Returns price with 1e8 precision
+		(, int256 price,,,) = priceFeed.latestRoundData(); // Returns price with 1e8 precision
 		return ((uint256(price) * ADDITIONAL_FEED_PRECISION) * amount) / PRECISION;
 	}
 
-	function getCollateralTokens() public view returns(address[] memory) {
+	function getCollateralTokens() public view returns (address[] memory) {
 		return s_collateralTokens;
 	}
 
@@ -211,11 +212,11 @@ contract Engine is ReentrancyGuardTransient {
 	}
 
 	/**
-	 * @notice Get the total value of collateral for a user
-	 * @return total The total value of collateral in USD with 1e18 precision
+	 *	@notice Get the total value of collateral for a user
+	 *	@return total The total value of collateral in USD with 1e18 precision
 	 */
 	function getCollateralValue(address user) public view returns (uint256 total) {
-		for(uint256 i = 0; i < s_collateralTokens.length; i++) {
+		for (uint256 i = 0; i < s_collateralTokens.length; i++) {
 			address token = s_collateralTokens[i];
 			uint256 amount = s_userToDeposit[user][token];
 			total += getValueInUSD(token, amount);
@@ -228,11 +229,14 @@ contract Engine is ReentrancyGuardTransient {
 		_checkOvercollateralizationHealthFactor(msg.sender);
 	}
 
-	function _redeemCollateralFromTo(address token, uint256 amount, address from, address to) private amountMoreThanZero(amount) {
+	function _redeemCollateralFromTo(address token, uint256 amount, address from, address to)
+		private
+		amountMoreThanZero(amount)
+	{
 		s_userToDeposit[from][token] -= amount;
 		emit CollateralRedeemed(from, token, amount);
 
-		bool success = IERC20(token).transfer(to, amount);	
+		bool success = IERC20(token).transfer(to, amount);
 		if (!success) {
 			revert Engine__TransferFailed();
 		}
@@ -253,21 +257,32 @@ contract Engine is ReentrancyGuardTransient {
 		i_stablecoin.burn(amount);
 	}
 
-	function burnStablecoinsAndRedeemCollateral(address collateralToken, uint256 collateralAmount, uint256 stablecoinsAmount ) public {
+	function burnStablecoinsAndRedeemCollateral(
+		address collateralToken,
+		uint256 collateralAmount,
+		uint256 stablecoinsAmount
+	) public {
 		burnStablecoins(stablecoinsAmount);
 		redeemCollateral(collateralToken, collateralAmount);
 	}
 
 	// — Health Factor —
 
-	function _getUserState(address user) private view returns(uint256 totalStablecoinsMinted, uint256 collateralValue /* In USD */) {
+	function _getUserState(address user)
+		private
+		view
+		returns (
+			uint256 totalStablecoinsMinted,
+			uint256 collateralValue /* In USD */
+		)
+	{
 		totalStablecoinsMinted = s_userToMintedStablecoins[user];
 		collateralValue = getCollateralValue(user);
 	}
 
 	/**
-	 * @notice Health Factor shows how close user to liquidation. If it's under 1, user can get liquidated
-	 * See example of mechanics in liquidation() documentation
+	 *	@notice Health Factor shows how close user to liquidation. If it's under 1, user can get liquidated
+	 *	See example of mechanics in liquidation() documentation
 	 */
 	function getHealthFactor(address user) public view returns (uint256) {
 		(uint256 totalStablecoinsMinted, uint256 collateralValue) = _getUserState(user);
@@ -278,7 +293,7 @@ contract Engine is ReentrancyGuardTransient {
 	}
 
 	/**
-	 * @notice Reverts if Health Factor breaks OVERCOLLATERALIZATION_HEALTH_FACTOR_THRESHOLD
+	 *	@notice Reverts if Health Factor breaks OVERCOLLATERALIZATION_HEALTH_FACTOR_THRESHOLD
 	 */
 	function _checkOvercollateralizationHealthFactor(address user) private view {
 		uint256 healthFactor = getHealthFactor(user);
@@ -288,7 +303,7 @@ contract Engine is ReentrancyGuardTransient {
 	}
 
 	/**
-	 * @notice Reverts if Health Factor breaks LIQUIDATION_HEALTH_FACTOR_THRESHOLD
+	 *	@notice Reverts if Health Factor breaks LIQUIDATION_HEALTH_FACTOR_THRESHOLD
 	 */
 	function _checkLiquidationHealthFactor(address user) private view {
 		uint256 healthFactor = getHealthFactor(user);
@@ -300,12 +315,12 @@ contract Engine is ReentrancyGuardTransient {
 	// — Liquidation —
 
 	/**
-	 * — Liquidation example —
-	 * 1. Alice put 100$ of wETH as collateral and take 50$ of Stablecoin (*2 overcollateralization)
-	 * 2. ETH price goes down to 55$ and happens Alice liqudation (10% liqudation buffer)
-	 * 3. Someone buys Alice wETH collateral (worth 55$) for 50$ of Stablecoin and grab extra 5$ as reward for liquidation
+	 *	— Liquidation example —
+	 *	1. Alice put 100$ of wETH as collateral and take 50$ of Stablecoin (*2 overcollateralization)
+	 *	2. ETH price goes down to 55$ and happens Alice liqudation (10% liqudation buffer)
+	 *	3. Someone buys Alice wETH collateral (worth 55$) for 50$ of Stablecoin and grab extra 5$ as reward for liquidation
 	 */
-	function liqudate(address user, address token, uint256 amount) public amountMoreThanZero(amount) nonReentrant() {
+	function liqudate(address user, address token, uint256 amount) public amountMoreThanZero(amount) nonReentrant {
 		uint256 startingUserHealthFactor = getHealthFactor(user);
 		if (startingUserHealthFactor > LIQUIDATION_HEALTH_FACTOR_THRESHOLD) {
 			revert Engine__HealthFactorIsOK();
@@ -333,5 +348,4 @@ contract Engine is ReentrancyGuardTransient {
 			revert Engine__BreaksLiquidationHealthFactorThreshold(senderHealthFactor);
 		}
 	}
-
 }

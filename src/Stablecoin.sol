@@ -1,7 +1,4 @@
-
-
-
-/* 
+/*
 Layout of Smart-Contract:
 1. Version
 2. Imports
@@ -14,7 +11,7 @@ Layout of Smart-Contract:
 9. Funcitons
 */
 
-/* 
+/*
 Layout of functions:
 1. Constructor
 2. Recive Function
@@ -26,22 +23,18 @@ Layout of functions:
 8. View, Pure
 */
 
-
-
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.26;
 
-
-import { ERC20, ERC20Burnable } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-
+import {ERC20, ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /*
 * @title Stablecoin Token ERC20 Implementation
 * @autor kuzminklk (Daniil Kuzmin)
 *
-* — Contract Description — 
+* — Contract Description —
 * ERC-20 implementation for stablecoin token. Meant to be governed by Engine smart-contract for buning and minting.
 *
 * — Stablecoin System Description —
@@ -51,14 +44,13 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 * (Similar to DAI, if DAI had no gevernance, no fees, and only backed by wETH, wBTC colateral)
 */
 contract Stablecoin is ERC20Burnable, Ownable {
-
 	constructor() ERC20("Stablecoin", "STABLE") Ownable(msg.sender) {}
 
 	function burn(uint256 _amount) public override onlyOwner {
 		super.burn(_amount);
-	} 
+	}
 
-	function mint(address _to, uint256 _amount) external onlyOwner returns(bool) {
+	function mint(address _to, uint256 _amount) external onlyOwner returns (bool) {
 		_mint(_to, _amount);
 		return true;
 	}

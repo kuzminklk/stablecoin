@@ -1,7 +1,4 @@
-
-
-
-/* 
+/*
 Layout of Smart-Contract:
 1. Version
 2. Imports
@@ -14,7 +11,7 @@ Layout of Smart-Contract:
 9. Funcitons
 */
 
-/* 
+/*
 Layout of functions:
 1. Constructor
 2. Recive Function
@@ -26,25 +23,23 @@ Layout of functions:
 8. View, Pure
 */
 
-
-
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.26;
 
-import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
-
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
 library Oracle {
-	uint256 private constant TIMEOUT = 3 hours;  
+	uint256 private constant TIMEOUT = 3 hours;
 
 	function checkPriceStaleness(AggregatorV3Interface priceFeed) public view returns (bool) {
-		(uint80 roundId, int256 answer, uint256 staratedAt, uint256 updatedAt, uint80 answerInRound) = priceFeed.latestRoundData();
+		(uint80 roundId, int256 answer, uint256 staratedAt, uint256 updatedAt, uint80 answerInRound) =
+			priceFeed.latestRoundData();
 		uint256 secondsSince = block.timestamp - updatedAt;
 		if (secondsSince > TIMEOUT) {
 			return true;
 		} else {
-		return false;
+			return false;
 		}
 	}
 }

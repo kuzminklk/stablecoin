@@ -1,19 +1,15 @@
-
-
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.19;
 
-import { Script } from "forge-std/Script.sol";
-import { ERC20Mock } from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
+import {Script} from "forge-std/Script.sol";
+import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
 
-import { Stablecoin } from "../src/Stablecoin.sol";
-import { Engine } from "../src/Engine.sol";
-import { MockV3Aggregator } from "../test/mocks/MockV3Aggregator.sol";
-
+import {Stablecoin} from "../src/Stablecoin.sol";
+import {Engine} from "../src/Engine.sol";
+import {MockV3Aggregator} from "../test/mocks/MockV3Aggregator.sol";
 
 contract HelperConfig is Script {
-
 	struct NetworkConfig {
 		address wethToUsdPriceFeed;
 		address wbtcToUsdPriceFeed;
@@ -22,13 +18,13 @@ contract HelperConfig is Script {
 	}
 
 	uint8 public constant DECIMALS = 8;
-	uint256 public constant USD_TO_ETH_PRICE = 2000 * 10 ** DECIMALS; 
-	uint256 public constant USD_TO_BTC_PRICE = 60000 * 10 ** DECIMALS; 
+	uint256 public constant USD_TO_ETH_PRICE = 2000 * 10 ** DECIMALS;
+	uint256 public constant USD_TO_BTC_PRICE = 60000 * 10 ** DECIMALS;
 
-	NetworkConfig public activeNetworkConfig; 
+	NetworkConfig public activeNetworkConfig;
 
 	constructor() {
-		if (block.chainid == 	11155111) {
+		if (block.chainid == 11155111) {
 			activeNetworkConfig = getEhtereumSepoliaConfig();
 		} else if (block.chainid == 31337) {
 			activeNetworkConfig = getOrCreateAnvilConfig();
@@ -51,11 +47,11 @@ contract HelperConfig is Script {
 		}
 
 		vm.startBroadcast();
-			MockV3Aggregator wethToUsdPriceFeed = new MockV3Aggregator(DECIMALS, int256(USD_TO_ETH_PRICE));
-			ERC20Mock weth = new ERC20Mock();
+		MockV3Aggregator wethToUsdPriceFeed = new MockV3Aggregator(DECIMALS, int256(USD_TO_ETH_PRICE));
+		ERC20Mock weth = new ERC20Mock();
 
-			MockV3Aggregator wbtcToUsdPriceFeed = new MockV3Aggregator(DECIMALS, int256(USD_TO_BTC_PRICE));
-			ERC20Mock wbtc = new ERC20Mock();
+		MockV3Aggregator wbtcToUsdPriceFeed = new MockV3Aggregator(DECIMALS, int256(USD_TO_BTC_PRICE));
+		ERC20Mock wbtc = new ERC20Mock();
 		vm.stopBroadcast();
 
 		return NetworkConfig({
@@ -66,6 +62,5 @@ contract HelperConfig is Script {
 		});
 	}
 
-	function run() external {
-	}
+	function run() external {}
 }

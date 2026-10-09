@@ -1,29 +1,23 @@
-
-
-
 /*
 — Invarians Of The System —
 1. Total supply of Stablecoin should be less than value of collateral * 2 (if price doesn't change)
 */
 
-
-
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.19;
 
-import { Engine } from "../../src/Engine.sol";
-import { Stablecoin } from "../../src/Stablecoin.sol";
-import { DeploySystem } from "../../script/DeploySystem.s.sol";
-import { HelperConfig } from "../../script/HelperConfig.s.sol";
-import { Handler } from "./Handler.t.sol";
+import {Engine} from "../../src/Engine.sol";
+import {Stablecoin} from "../../src/Stablecoin.sol";
+import {DeploySystem} from "../../script/DeploySystem.s.sol";
+import {HelperConfig} from "../../script/HelperConfig.s.sol";
+import {Handler} from "./Handler.t.sol";
 
-import { console, Test } from "forge-std/Test.sol";
-import { StdInvariant } from "forge-std/StdInvariant.sol";
-import { ERC20Mock } from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { MockV3Aggregator } from "../mocks/MockV3Aggregator.sol";
-
+import {console, Test} from "forge-std/Test.sol";
+import {StdInvariant} from "forge-std/StdInvariant.sol";
+import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {MockV3Aggregator} from "../mocks/MockV3Aggregator.sol";
 
 contract Invariant is StdInvariant, Test {
 	uint256 public constant USER1_WETH_BALANCE = 100 ether; // Equal 100 wETH
@@ -68,5 +62,4 @@ contract Invariant is StdInvariant, Test {
 
 		assert(wethValue >= stablecoinsTotalSupply * 2);
 	}
-
 }
