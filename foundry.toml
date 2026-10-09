@@ -10,6 +10,10 @@ fs_permissions = [
 	{ access = "read", path = "./uri" },
 ]
 
+[fmt]
+style = "tab"
+tab_width = 2
+
 [invariant]
 runs = 128
 depth = 128
